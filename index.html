@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GeoLocation Dashboard | 商业地理分析系统</title>
+    <link rel="stylesheet" href="https://lf6-cdn-tos.bytecdntp.com/cdn/expire-100-M/font-awesome/6.0.0/css/all.min.css">  
+    <link rel="stylesheet" href="https://s2.ssl.qhres2.com/static/56662140ef7d5d03.css">  
+    <style>
+        :root {
+            --primary: #3a86ff;
+            --secondary: #8338ec;
+            --accent: #ff006e;
+            --dark: #1a1a2e;
+            --light: #f8f9fa;
+        }
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background-color: #f5f7fa;
+            color: var(--dark);
+            min-height: 100vh;
+        }
+        .card {
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            transition: all 0.3s ease;
+            border-radius: 12px;
+            overflow: hidden;
+        }
+        .card:hover {
+            box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
+            transform: translateY(-2px);
+        }
+        .map-container {
+            height: 500px;
+            width: 100%;
+            border-radius: 12px;
+            overflow: hidden;
+        }
+        .input-group {
+            position: relative;
+        }
+        .input-group input {
+            padding-right: 2.5rem;
+        }
+        .input-group-icon {
+            position: absolute;
+            right: 0.75rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--primary);
+        }
+        .data-badge {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            border-radius: 8px;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-fade-in {
+            animation: fadeIn 0.5s ease-out forwards;
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <div class="container mx-auto px-4 py-8">
+        <header class="mb-10 text-center">
+            <h1 class="text-4xl font-bold text-gray-800 mb-2">GeoLocation <span class="text-transparent bg-clip-text bg-gradient-to-r from-blue-500 to-purple-600">Analytics</span></h1>
+            <p class="text-gray-600 max-w-2xl mx-auto">商业级IP地理定位与可视化分析系统</p>
+        </header>
+ 
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+            <div class="lg:col-span-2">
+                <div class="card bg-white p-6">
+                    <div class="flex justify-between items-center mb-4">
+                        <h2 class="text-xl font-semibold text-gray-800">地理信息可视化</h2>
+                        <div class="flex space-x-2">
+                            <button id="refresh-btn" class="px-3 py-1 bg-blue-50 text-blue-600 rounded-full text-sm flex items-center">
+                                <i class="fas fa-sync-alt mr-1"></i> 刷新 
+                            </button>
+                        </div>
+                    </div>
+                    <div id="map-container" class="map-container"></div>
+                </div>
+            </div>
+ 
+            <div>
+                <div class="card bg-white p-6 h-full">
+                    <h2 class="text-xl font-semibold text-gray-800 mb-4">IP定位查询</h2>
+                    
+                    <div class="mb-6">
+                        <label class="block text-sm font-medium text-gray-700 mb-1">输入IP地址</label>
+                        <div class="input-group relative">
+                            <input type="text" id="ip-input" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" placeholder="例如: 218.202.77.106">
+                            <div class="input-group-icon">
+                                <i class="fas fa-map-marker-alt"></i>
+                            </div>
+                        </div>
+                    </div>
+ 
+                    <button id="submit-btn" class="w-full bg-gradient-to-r from-blue-500 to-purple-600 text-white py-2 px-4 rounded-lg hover:opacity-90 transition-all duration-200 flex items-center justify-center">
+                        <i class="fas fa-search-location mr-2"></i> 查询位置 
+                    </button>
+ 
+                    <div id="result-container" class="mt-6 space-y-4 hidden animate-fade-in">
+                        <div class="grid grid-cols-2 gap-4">
+                            <div class="data-badge p-3">
+                                <p class="text-xs text-blue-100">国家</p>
+                                <p id="country" class="font-medium">-</p>
+                            </div>
+                            <div class="data-badge p-3">
+                                <p class="text-xs text-blue-100">省份</p>
+                                <p id="province" class="font-medium">-</p>
+                            </div>
+                        </div>
+                        <div class="grid grid-cols-2 gap-4">
+                            <div class="data-badge p-3">
+                                <p class="text-xs text-blue-100">城市</p>
+                                <p id="city" class="font-medium">-</p>
+                            </div>
+                            <div class="data-badge p-3">
+                                <p class="text-xs text-blue-100">区域</p>
+                                <p id="district" class="font-medium">-</p>
+                            </div>
+                        </div>
+                        <div class="grid grid-cols-2 gap-4">
+                            <div class="data-badge p-3">
+                                <p class="text-xs text-blue-100">经度</p>
+                                <p id="lng" class="font-medium">-</p>
+                            </div>
+                            <div class="data-badge p-3">
+                                <p class="text-xs text-blue-100">纬度</p>
+                                <p id="lat" class="font-medium">-</p>
+                            </div>
+                        </div>
+                        <div class="data-badge p-3">
+                            <p class="text-xs text-blue-100">详细地址</p>
+                            <p id="detail" class="font-medium">-</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+ 
+    <!-- 使用高德地图JS API -->
+    <script type="text/javascript">
+        window._AMapSecurityConfig = {
+            serviceHost: "https://bot.n.cn/_AMapService", 
+        };
+    </script>
+    <script src="https://webapi.amap.com/maps?v=2.0&key=834b0ef90a0c08500b7a24dfdd6cf9ef"></script>  
+    <script>
+        document.addEventListener('DOMContentLoaded',  function() {
+            // 初始化地图 
+            const map = new AMap.Map('map-container', {
+                zoom: 12,
+                viewMode: '3D',
+                pitch: 50,
+                rotation: -15 
+            });
+ 
+            // 添加地图控件 
+            AMap.plugin([  
+                'AMap.ToolBar',
+                'AMap.Scale',
+                'AMap.HawkEye',
+                'AMap.MapType',
+                'AMap.Geolocation'
+            ], function() {
+                map.addControl(new  AMap.ToolBar());
+                map.addControl(new  AMap.Scale());
+                map.addControl(new  AMap.HawkEye({isOpen:true}));
+                map.addControl(new  AMap.MapType());
+                map.addControl(new  AMap.Geolocation());
+            });
+ 
+            // 解决favicon.ico  404问题 
+            const link = document.createElement('link');  
+            link.rel  = 'icon';
+            link.href  = 'data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22  viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📍</text></svg>';
+            document.head.appendChild(link);  
+ 
+            // 查询按钮点击事件 
+            document.getElementById('submit-btn').addEventListener('click',  async function() {
+                const ip = document.getElementById('ip-input').value.trim();  
+                if (!ip) {
+                    alert('请输入有效的IP地址');
+                    return;
+                }
+ 
+                // 显示加载状态 
+                const submitBtn = document.getElementById('submit-btn');  
+                const originalText = submitBtn.innerHTML;  
+                submitBtn.innerHTML  = '<i class="fas fa-spinner fa-spin mr-2"></i> 查询中...';
+                submitBtn.disabled  = true;
+ 
+                try {
+                    // 1. 获取IP定位信息 
+                    const ipLocResponse = await fetch(`http://127.0.0.1:3000/api/ip-loc?ip=${ip}`);
+                    if (!ipLocResponse.ok)  {
+                        throw new Error('IP定位请求失败');
+                    }
+                    const ipData = await ipLocResponse.json(); 
+                    
+                    // 2. 获取详细位置信息 
+                    const lat = ipData.data.lat; 
+                    const lng = ipData.data.lng; 
+                    const detailResponse = await fetch(`http://127.0.0.1:3000/api/latlng-loc?lat=${lat}&lng=${lng}`);
+                    if (!detailResponse.ok)  {
+                        throw new Error('详细位置请求失败');
+                    }
+                    const detailData = await detailResponse.json(); 
+ 
+                    // 更新UI 
+                    updateUI(ipData, detailData);
+                    
+                    // 更新地图标记 
+                    updateMapMarker(detailData.data.lng,  detailData.data.lat,  detailData.data.detail); 
+                } catch (error) {
+                    console.error(' 查询失败:', error);
+                    alert(`查询失败: ${error.message}`); 
+                } finally {
+                    // 恢复按钮状态 
+                    submitBtn.innerHTML  = originalText;
+                    submitBtn.disabled  = false;
+                }
+            });
+ 
+            // 刷新按钮点击事件 
+            document.getElementById('refresh-btn').addEventListener('click',  function() {
+                const ip = document.getElementById('ip-input').value.trim();  
+                if (ip) {
+                    document.getElementById('submit-btn').click(); 
+                }
+            });
+ 
+            // 更新UI显示数据 
+            function updateUI(ipResponse, latLngResponse) {
+                const resultContainer = document.getElementById('result-container');  
+                resultContainer.classList.remove('hidden');  
+ 
+                // 更新IP信息 
+                document.getElementById('country').textContent  = ipResponse.data.rgeo?.country  || '-'; 
+                document.getElementById('province').textContent  = ipResponse.data.rgeo?.province  || '-'; 
+                document.getElementById('city').textContent  = ipResponse.data.rgeo?.city  || '-'; 
+                document.getElementById('district').textContent  = ipResponse.data.rgeo?.district  || '-'; 
+                document.getElementById('lng').textContent  = ipResponse.data.lng  || '-'; 
+                document.getElementById('lat').textContent  = ipResponse.data.lat  || '-'; 
+                document.getElementById('detail').textContent  = latLngResponse.data.detail  || '-'; 
+            }
+ 
+            // 更新地图标记 
+            function updateMapMarker(lng, lat, title) {
+                // 清除现有标记 
+                map.clearMap();  
+ 
+                // 添加新标记 
+                const marker = new AMap.Marker({
+                    position: new AMap.LngLat(lng, lat),
+                    title: title,
+                    offset: new AMap.Pixel(-13, -30) 
+                });
+                map.add(marker);  
+ 
+                // 设置地图中心点 
+                map.setCenter([lng,  lat]);
+ 
+                // 添加信息窗口 
+                const infoWindow = new AMap.InfoWindow({
+                    content: `<div class="p-2">
+                        <h3 class="font-bold">${title}</h3>
+                        <p class="text-sm">经度: ${lng?.toFixed(6) || '-'}</p> 
+                        <p class="text-sm">纬度: ${lat?.toFixed(6) || '-'}</p> 
+                    </div>`,
+                    offset: new AMap.Pixel(0, -30)
+                });
+                
+                infoWindow.open(map,  marker.getPosition());  
+            }
+ 
+            // 初始化默认IP 
+            document.getElementById('ip-input').value  = '218.202.77.106';
+        });
+    </script>
+</body>
+</html>
