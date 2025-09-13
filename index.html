@@ -189,14 +189,13 @@
             serviceHost: "https://bot.n.cn/_AMapService", 
         };
     </script>
-    <script src="https://webapi.amap.com/maps?v=2.0&key=834b0ef90a0c08500b7a24dfdd66cf9ef"></script>  
+    <script src="https://webapi.amap.com/maps?v=2.0&key=834b0ef90a0c08500b7a24dfdd66cf9ef&callback=initPage"></script>  
     <script>
-        document.addEventListener('DOMContentLoaded',  function() {
+        function initPage() {
             // 初始化地图 
             const map = new AMap.Map('map-container', {
                 zoom: 12,
-                center: [116.4074, 39.9042], // 北京市中心坐标],
-
+                center: [116.4074, 39.9042], // 北京市中心坐标
                 viewMode: '3D',
                 pitch: 50,
                 rotation: -15 
@@ -210,21 +209,21 @@
                 'AMap.MapType',
                 'AMap.Geolocation'
             ], function() {
-                map.addControl(new  AMap.ToolBar());
-                map.addControl(new  AMap.Scale());
-                map.addControl(new  AMap.HawkEye({isOpen:true}));
-                map.addControl(new  AMap.MapType());
-                map.addControl(new  AMap.Geolocation());
+                map.addControl(new AMap.ToolBar());
+                map.addControl(new AMap.Scale());
+                map.addControl(new AMap.HawkEye({isOpen:true}));
+                map.addControl(new AMap.MapType());
+                map.addControl(new AMap.Geolocation());
             });
  
-            // 解决favicon.ico  404问题 
+            // 解决favicon.ico 404问题 
             const link = document.createElement('link');  
-            link.rel  = 'icon';
-            link.href  = 'data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22  viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📍</text></svg>';
+            link.rel = 'icon';
+            link.href = 'data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📍</text></svg>';
             document.head.appendChild(link);  
  
             // 查询按钮点击事件 
-            document.getElementById('submit-btn').addEventListener('click',  async function() {
+            document.getElementById('submit-btn').addEventListener('click', async function() {
                 const ip = document.getElementById('ip-input').value.trim();  
                 if (!ip) {
                     alert('请输入有效的IP地址');
@@ -234,13 +233,13 @@
                 // 显示加载状态 
                 const submitBtn = document.getElementById('submit-btn');  
                 const originalText = submitBtn.innerHTML;  
-                submitBtn.innerHTML  = '<i class="fas fa-spinner fa-spin mr-2"></i> 查询中...';
-                submitBtn.disabled  = true;
+                submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> 查询中...';
+                submitBtn.disabled = true;
  
                 try {
                     // 1. 获取IP定位信息 
                     const ipLocResponse = await fetch(`/api/ip-loc?ip=${ip}`);
-                    if (!ipLocResponse.ok)  {
+                    if (!ipLocResponse.ok) {
                         throw new Error('IP定位请求失败');
                     }
                     const ipData = await ipLocResponse.json(); 
@@ -249,7 +248,7 @@
                     const lat = ipData.data.lat; 
                     const lng = ipData.data.lng; 
                     const detailResponse = await fetch(`/api/latlng-loc?lat=${lat}&lng=${lng}`);
-                    if (!detailResponse.ok)  {
+                    if (!detailResponse.ok) {
                         throw new Error('详细位置请求失败');
                     }
                     const detailData = await detailResponse.json(); 
@@ -258,19 +257,19 @@
                     updateUI(ipData, detailData);
                     
                     // 更新地图标记 
-                    updateMapMarker(detailData.data.lng,  detailData.data.lat,  detailData.data.detail); 
+                    updateMapMarker(map, detailData.data.lng, detailData.data.lat, detailData.data.detail); 
                 } catch (error) {
-                    console.error(' 查询失败:', error);
+                    console.error('查询失败:', error);
                     alert(`查询失败: ${error.message}`); 
                 } finally {
                     // 恢复按钮状态 
-                    submitBtn.innerHTML  = originalText;
-                    submitBtn.disabled  = false;
+                    submitBtn.innerHTML = originalText;
+                    submitBtn.disabled = false;
                 }
             });
  
             // 刷新按钮点击事件 
-            document.getElementById('refresh-btn').addEventListener('click',  function() {
+            document.getElementById('refresh-btn').addEventListener('click', function() {
                 const ip = document.getElementById('ip-input').value.trim();  
                 if (ip) {
                     document.getElementById('submit-btn').click(); 
@@ -283,46 +282,17 @@
                 resultContainer.classList.remove('hidden');  
  
                 // 更新IP信息 
-                document.getElementById('country').textContent  = ipResponse.data.rgeo?.country  || '-'; 
-                document.getElementById('province').textContent  = ipResponse.data.rgeo?.province  || '-'; 
-                document.getElementById('city').textContent  = ipResponse.data.rgeo?.city  || '-'; 
-                document.getElementById('district').textContent  = ipResponse.data.rgeo?.district  || '-'; 
-                document.getElementById('lng').textContent  = ipResponse.data.lng  || '-'; 
-                document.getElementById('lat').textContent  = ipResponse.data.lat  || '-'; 
-                document.getElementById('detail').textContent  = latLngResponse.data.detail  || '-'; 
-            }
- 
-            // 更新地图标记 
-            function updateMapMarker(lng, lat, title) {
-                // 清除现有标记 
-                map.clearMap();  
- 
-                // 添加新标记 
-                const marker = new AMap.Marker({
-                    position: new AMap.LngLat(lng, lat),
-                    title: title,
-                    offset: new AMap.Pixel(-13, -30) 
-                });
-                map.add(marker);  
- 
-                // 设置地图中心点 
-                map.setCenter([lng,  lat]);
- 
-                // 添加信息窗口 
-                const infoWindow = new AMap.InfoWindow({
-                    content: `<div class="p-2">
-                        <h3 class="font-bold">${title}</h3>
-                        <p class="text-sm">经度: ${lng?.toFixed(6) || '-'}</p> 
-                        <p class="text-sm">纬度: ${lat?.toFixed(6) || '-'}</p> 
-                    </div>`,
-                    offset: new AMap.Pixel(0, -30)
-                });
-                
-                infoWindow.open(map,  marker.getPosition());  
+                document.getElementById('country').textContent = ipResponse.data.rgeo?.country || '-'; 
+                document.getElementById('province').textContent = ipResponse.data.rgeo?.province || '-'; 
+                document.getElementById('city').textContent = ipResponse.data.rgeo?.city || '-'; 
+                document.getElementById('district').textContent = ipResponse.data.rgeo?.district || '-'; 
+                document.getElementById('lng').textContent = ipResponse.data.lng || '-'; 
+                document.getElementById('lat').textContent = ipResponse.data.lat || '-'; 
+                document.getElementById('detail').textContent = latLngResponse.data.detail || '-'; 
             }
  
             // 初始化默认IP 
-            document.getElementById('ip-input').value  = '1.1.1.1';
+            document.getElementById('ip-input').value = '1.1.1.1';
 
             // 初始化国内IP地图
             const domesticMap = new AMap.Map("domestic-map-container", {
@@ -409,33 +379,42 @@
                 }
             }
 
-            // 通用地图标记更新函数
+            // 通用地图标记更新函数 
             function updateMapMarker(mapInstance, lng, lat, title) {
-                mapInstance.clearMap();
+                // 清除现有标记 
+                mapInstance.clearMap();  
+ 
+                // 添加新标记 
                 const marker = new AMap.Marker({
                     position: new AMap.LngLat(lng, lat),
                     title: title,
-                    offset: new AMap.Pixel(-13, -30),
+                    offset: new AMap.Pixel(-13, -30) 
                 });
-                mapInstance.add(marker);
+                mapInstance.add(marker);  
+ 
+                // 设置地图中心点 
                 mapInstance.setCenter([lng, lat]);
+ 
+                // 添加信息窗口 
                 const infoWindow = new AMap.InfoWindow({
-                    content: `
-                        <div class="p-2">
-                            <h3 class="font-bold">${title}</h3>
-                            <p class="text-sm">经度: ${lng?.toFixed(6) || "-"}</p>
-                            <p class="text-sm">纬度: ${lat?.toFixed(6) || "-"}</p>
-                        </div>
-                    `,
-                    offset: new AMap.Pixel(0, -30),
+                    content: `<div class="p-2">
+                        <h3 class="font-bold">${title}</h3>
+                        <p class="text-sm">经度: ${lng?.toFixed(6) || '-'}</p> 
+                        <p class="text-sm">纬度: ${lat?.toFixed(6) || '-'}</p> 
+                    </div>`,
+                    offset: new AMap.Pixel(0, -30)
                 });
-                infoWindow.open(mapInstance, marker.getPosition());
+                
+                infoWindow.open(mapInstance, marker.getPosition());  
             }
 
             // 页面加载时调用
             getDomesticIpInfo();
             getInternationalIpInfo();
-        });
+
+            // 默认执行一次查询
+            document.getElementById('submit-btn').click();
+        }
     </script>
 </body>
 </html>
