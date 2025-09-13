@@ -198,7 +198,7 @@
  
                 try {
                     // 1. 获取IP定位信息 
-                    const ipLocResponse = await fetch(`http://127.0.0.1:3000/api/ip-loc?ip=${ip}`);
+                    const ipLocResponse = await fetch(`/api/ip-loc?ip=${ip}`);
                     if (!ipLocResponse.ok)  {
                         throw new Error('IP定位请求失败');
                     }
@@ -207,7 +207,7 @@
                     // 2. 获取详细位置信息 
                     const lat = ipData.data.lat; 
                     const lng = ipData.data.lng; 
-                    const detailResponse = await fetch(`http://127.0.0.1:3000/api/latlng-loc?lat=${lat}&lng=${lng}`);
+                    const detailResponse = await fetch(`/api/latlng-loc?lat=${lat}&lng=${lng}`);
                     if (!detailResponse.ok)  {
                         throw new Error('详细位置请求失败');
                     }
