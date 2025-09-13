@@ -189,7 +189,7 @@
             serviceHost: "https://bot.n.cn/_AMapService", 
         };
     </script>
-    <script src="https://webapi.amap.com/maps?v=2.0&key=834b0ef90a0c08500b7a24dfdd6cf9ef"></script>  
+    <script src="https://webapi.amap.com/maps?v=2.0&key=834b0ef90a0c08500b7a24dfdd66cf9ef"></script>  
     <script>
         document.addEventListener('DOMContentLoaded',  function() {
             // 初始化地图 
@@ -323,11 +323,6 @@
  
             // 初始化默认IP 
             document.getElementById('ip-input').value  = '1.1.1.1';
-        });
-    </script>
-</body>
-</html>
-
 
             // 初始化国内IP地图
             const domesticMap = new AMap.Map("domestic-map-container", {
@@ -424,13 +419,14 @@
                 });
                 mapInstance.add(marker);
                 mapInstance.setCenter([lng, lat]);
-
                 const infoWindow = new AMap.InfoWindow({
-                    content: `<div class="p-2">
-                        <h3 class="font-bold">${title}</h3>
-                        <p class="text-sm">经度: ${lng?.toFixed(6) || "-"}</p>
-                        <p class="text-sm">纬度: ${lat?.toFixed(6) || "-"}</p>
-                    </div>`,
+                    content: `
+                        <div class="p-2">
+                            <h3 class="font-bold">${title}</h3>
+                            <p class="text-sm">经度: ${lng?.toFixed(6) || "-"}</p>
+                            <p class="text-sm">纬度: ${lat?.toFixed(6) || "-"}</p>
+                        </div>
+                    `,
                     offset: new AMap.Pixel(0, -30),
                 });
                 infoWindow.open(mapInstance, marker.getPosition());
