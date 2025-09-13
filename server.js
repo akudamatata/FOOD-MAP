@@ -4,16 +4,19 @@ const axios = require('axios');
 const cors = require('cors');
  
 const app = express();
-const PORT = process.env.PORT  || 3000;
+const PORT = process.env.PORT || 3000;
  
 // 配置CORS 
 app.use(cors()); 
- 
+
 // 解析JSON请求体 
 app.use(express.json()); 
+
+// 提供静态文件服务
+app.use(express.static('.')); 
  
 // 高德地图Key - 建议存储在环境变量中 
-const AMAP_KEY = process.env.AMAP_KEY  || '834b0ef90a0c08500b7a24dfdd66cf9ef';
+const AMAP_KEY = process.env.AMAP_KEY || '834b0ef90a0c08500b7a24dfdd66cf9ef';
  
 // 美团IP定位代理 
 app.get('/api/ip-loc',  async (req, res) => {
@@ -92,6 +95,6 @@ app.get('/api/amap/regeocode',  async (req, res) => {
 });
  
 // 启动服务器 
-app.listen(PORT,  () => {
-    console.log(` 服务器运行在 http://localhost:${PORT}`);
+app.listen(PORT, () => {
+    console.log(`服务器运行在 http://localhost:${PORT}`);
 });
