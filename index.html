@@ -1,4 +1,4 @@
-'''<!DOCTYPE html>  
+<!DOCTYPE html>  
 <html lang="zh-CN">  
 <head>  
     <meta charset="UTF-8">  
@@ -187,232 +187,232 @@
     <script type="text/javascript">  
         window._AMapSecurityConfig = {  
             serviceHost: "https://bot.n.cn/_AMapService",   
-        };  
+        };
     </script>  
-    <script src="https://webapi.amap.com/maps?v=2.0&key=834b0ef90a0c08500b7a24dfdd66cf9ef"></script>    
-    <script>  
-        document.addEventListener('DOMContentLoaded',  function() {  
-            // 初始化地图   
-            const map = new AMap.Map('map-container', {  
-                zoom: 12,  
-                center: [116.4074, 39.9042], // 北京市中心坐标  
-  
-                viewMode: '3D',  
-                pitch: 50,  
-                rotation: -15   
-            });  
-   
-            // 添加地图控件   
-            AMap.plugin([    
-                'AMap.ToolBar',  
-                'AMap.Scale',  
-                'AMap.HawkEye',  
-                'AMap.MapType',  
-                'AMap.Geolocation'  
-            ], function() {  
-                map.addControl(new  AMap.ToolBar());  
-                map.addControl(new  AMap.Scale());  
-                map.addControl(new  AMap.HawkEye({isOpen:true}));  
-                map.addControl(new  AMap.MapType());  
-                map.addControl(new  AMap.Geolocation());  
-            });  
-   
-            // 解决favicon.ico  404问题   
-            const link = document.createElement('link');    
-            link.rel  = 'icon';  
-            link.href  = 'data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22  viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📍</text></svg>';  
-            document.head.appendChild(link);    
-   
-            // 查询按钮点击事件   
-            document.getElementById('submit-btn').addEventListener('click',  async function() {  
-                const ip = document.getElementById('ip-input').value.trim();    
-                if (!ip) {  
-                    alert('请输入有效的IP地址');  
-                    return;  
-                }  
-   
-                // 显示加载状态   
-                const submitBtn = document.getElementById('submit-btn');    
-                const originalText = submitBtn.innerHTML;    
-                submitBtn.innerHTML  = '<i class="fas fa-spinner fa-spin mr-2"></i> 查询中...';  
-                submitBtn.disabled  = true;  
-   
-                try {  
-                    // 1. 获取IP定位信息   
-                    const ipLocResponse = await fetch(`/api/ip-loc?ip=${ip}`);  
-                    if (!ipLocResponse.ok)  {  
-                        throw new Error('IP定位请求失败');  
-                    }  
-                    const ipData = await ipLocResponse.json();   
-                      
-                    // 2. 获取详细位置信息   
-                    const lat = ipData.data.lat;   
-                    const lng = ipData.data.lng;   
-                    const detailResponse = await fetch(`/api/latlng-loc?lat=${lat}&lng=${lng}`);  
-                    if (!detailResponse.ok)  {  
-                        throw new Error('详细位置请求失败');  
-                    }  
-                    const detailData = await detailResponse.json();   
-   
-                    // 更新UI   
+    <script src="https://webapi.amap.com/maps?v=2.0&key=834b0ef90a0c08500b7a24dfdd6cf9ef"></script>  
+    <script>
+        document.addEventListener('DOMContentLoaded',  function() {
+            // 初始化地图 
+            const map = new AMap.Map('map-container', {
+                zoom: 12,
+                center: [116.4074, 39.9042], // 北京市中心坐标
+
+                viewMode: '3D',
+                pitch: 50,
+                rotation: -15 
+            });
+ 
+            // 添加地图控件 
+            AMap.plugin([  
+                'AMap.ToolBar',
+                'AMap.Scale',
+                'AMap.HawkEye',
+                'AMap.MapType',
+                'AMap.Geolocation'
+            ], function() {
+                map.addControl(new  AMap.ToolBar());
+                map.addControl(new  AMap.Scale());
+                map.addControl(new  AMap.HawkEye({isOpen:true}));
+                map.addControl(new  AMap.MapType());
+                map.addControl(new  AMap.Geolocation());
+            });
+ 
+            // 解决favicon.ico  404问题 
+            const link = document.createElement('link');  
+            link.rel  = 'icon';
+            link.href  = 'data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22  viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📍</text></svg>';
+            document.head.appendChild(link);  
+ 
+            // 查询按钮点击事件 
+            document.getElementById('submit-btn').addEventListener('click',  async function() {
+                const ip = document.getElementById('ip-input').value.trim();  
+                if (!ip) {
+                    alert('请输入有效的IP地址');
+                    return;
+                }
+ 
+                // 显示加载状态 
+                const submitBtn = document.getElementById('submit-btn');  
+                const originalText = submitBtn.innerHTML;  
+                submitBtn.innerHTML  = '<i class="fas fa-spinner fa-spin mr-2"></i> 查询中...';
+                submitBtn.disabled  = true;
+ 
+                try {
+                    // 1. 获取IP定位信息 
+                    const ipLocResponse = await fetch(`/api/ip-loc?ip=${ip}`);
+                    if (!ipLocResponse.ok)  {
+                        throw new Error('IP定位请求失败');
+                    }
+                    const ipData = await ipLocResponse.json(); 
+                    
+                    // 2. 获取详细位置信息 
+                    const lat = ipData.data.lat; 
+                    const lng = ipData.data.lng; 
+                    const detailResponse = await fetch(`/api/latlng-loc?lat=${lat}&lng=${lng}`);
+                    if (!detailResponse.ok)  {
+                        throw new Error('详细位置请求失败');
+                    }
+                    const detailData = await detailResponse.json(); 
+ 
+                    // 更新UI 
                     updateUI(ipData, detailData);  
-                      
-                    // 更新地图标记   
-                    updateMapMarker(map, detailData.data.lng,  detailData.data.lat,  detailData.data.detail);   
-                } catch (error) {  
-                    console.error(' 查询失败:', error);  
-                    alert(`查询失败: ${error.message}`);   
-                } finally {  
-                    // 恢复按钮状态   
-                    submitBtn.innerHTML  = originalText;  
-                    submitBtn.disabled  = false;  
-                }  
-            });  
-   
-            // 刷新按钮点击事件   
-            document.getElementById('refresh-btn').addEventListener('click',  function() {  
-                const ip = document.getElementById('ip-input').value.trim();    
-                if (ip) {  
-                    document.getElementById('submit-btn').click();   
-                }  
-            });  
-   
-            // 更新UI显示数据   
-            function updateUI(ipResponse, latLngResponse) {  
-                const resultContainer = document.getElementById('result-container');    
-                resultContainer.classList.remove('hidden');    
-   
-                // 更新IP信息   
-                document.getElementById('country').textContent  = ipResponse.data.rgeo?.country  || '-';   
-                document.getElementById('province').textContent  = ipResponse.data.rgeo?.province  || '-';   
-                document.getElementById('city').textContent  = ipResponse.data.rgeo?.city  || '-';   
-                document.getElementById('district').textContent  = ipResponse.data.rgeo?.district  || '-';   
-                document.getElementById('lng').textContent  = ipResponse.data.lng  || '-';   
-                document.getElementById('lat').textContent  = ipResponse.data.lat  || '-';   
-                document.getElementById('detail').textContent  = latLngResponse.data.detail  || '-';   
-            }  
-   
-            // 初始化默认IP   
-            document.getElementById('ip-input').value  = '1.1.1.1';  
-  
-            // 初始化国内IP地图  
-            const domesticMap = new AMap.Map("domestic-map-container", {  
-                zoom: 12,  
-                center: [116.4074, 39.9042], // 默认北京  
-                viewMode: "3D",  
-                pitch: 50,  
-                rotation: -15,  
-            });  
-  
-            // 初始化国外IP地图  
-            const internationalMap = new AMap.Map("international-map-container", {  
-                zoom: 12,  
-                center: [0, 0], // 默认世界中心  
-                viewMode: "3D",  
-                pitch: 50,  
-                rotation: -15,  
-            });  
-  
-            // 获取并显示国内IP信息  
-            async function getDomesticIpInfo() {  
-                try {  
-                    const response = await fetch("/api/domestic-ip");  
-                    const result = await response.json();  
-                    if (result.ret === 200 && result.data) {  
-                        const data = result.data;  
-                        document.getElementById("domestic-ip").textContent = data.ip;  
-                        const address = `${data.country}/${data.prov}/${data.city}/${data.area}`;  
-                        document.getElementById("domestic-address").textContent = address;  
-  
-                        let lat = data.lat;  
-                        let lng = data.lng;  
-  
-                        // 尝试使用美团接口获取更精确的经纬度  
-                        const ipLocResponse = await fetch(`/api/ip-loc?ip=${data.ip}`);  
-                        const ipLocData = await ipLocResponse.json();  
-                        if (ipLocData.data && ipLocData.data.lat && ipLocData.data.lng) {  
-                            lat = ipLocData.data.lat;  
-                            lng = ipLocData.data.lng;  
-                        }  
-  
-                        if (lng && lat) {  
-                            updateMapMarker(domesticMap, parseFloat(lng), parseFloat(lat), address);  
-                        }  
-                    }  
-                } catch (error) {  
-                    console.error("获取国内IP信息失败:", error);  
-                    document.getElementById("domestic-ip").textContent = "获取失败";  
-                    document.getElementById("domestic-address").textContent = "获取失败";  
-                }  
-            }  
-  
-            // 获取并显示国外IP信息  
-            async function getInternationalIpInfo() {  
-                try {  
-                    // 首先获取本机的国外IP地址  
-                    const ipResponse = await fetch("/api/international-ip");  
-                    const ipData = await ipResponse.json();  
-                    if (ipData.status === "success") {  
-                        document.getElementById("international-ip").textContent = ipData.query;  
-                        const address = `${ipData.country}/${ipData.regionName}/${ipData.city}`;  
-                        document.getElementById("international-address").textContent = address;  
-  
-                        let lat = ipData.lat;  
-                        let lng = ipData.lon;  
-  
-                        // 尝试使用美团接口获取更精确的经纬度  
-                        const meituanIpLocResponse = await fetch(`/api/ip-loc?ip=${ipData.query}`);  
-                        const meituanIpLocData = await meituanIpLocResponse.json();  
-  
-                        if (meituanIpLocData.data && meituanIpLocData.data.lat && meituanIpLocData.data.lng) {  
-                            lat = meituanIpLocData.data.lat;  
-                            lng = meituanIpLocData.data.lng;  
-                        }  
-  
-                        if (lng && lat) {  
-                            updateMapMarker(internationalMap, parseFloat(lng), parseFloat(lat), address);  
-                        }  
-                    }  
-                } catch (error) {  
-                    console.error("获取国外IP信息失败:", error);  
-                    document.getElementById("international-ip").textContent = "获取失败";  
-                    document.getElementById("international-address").textContent = "获取失败";  
-                }  
-            }  
-  
-            // 通用地图标记更新函数   
-            function updateMapMarker(mapInstance, lng, lat, title) {  
-                // 清除现有标记   
-                mapInstance.clearMap();    
-   
-                // 添加新标记   
-                const marker = new AMap.Marker({  
-                    position: new AMap.LngLat(lng, lat),  
-                    title: title,  
-                    offset: new AMap.Pixel(-13, -30)   
-                });  
-                mapInstance.add(marker);    
-   
-                // 设置地图中心点   
-                mapInstance.setCenter([lng, lat]);  
-   
-                // 添加信息窗口   
-                const infoWindow = new AMap.InfoWindow({  
-                    content: `<div class="p-2">  
-                        <h3 class="font-bold">${title}</h3>  
-                        <p class="text-sm">经度: ${lng?.toFixed(6) || '-'}</p>   
-                        <p class="text-sm">纬度: ${lat?.toFixed(6) || '-'}</p>   
-                    </div>`,  
-                    offset: new AMap.Pixel(0, -30)  
-                });  
-                  
-                infoWindow.open(mapInstance, marker.getPosition());    
-            }  
-  
-            // 页面加载时调用  
-            getDomesticIpInfo();  
-            getInternationalIpInfo();  
-        });  
-    </script>  
+                    
+                    // 更新地图标记 
+                    updateMapMarker(map, detailData.data.lng,  detailData.data.lat,  detailData.data.detail); 
+                } catch (error) {
+                    console.error(' 查询失败:', error);
+                    alert(`查询失败: ${error.message}`); 
+                } finally {
+                    // 恢复按钮状态 
+                    submitBtn.innerHTML  = originalText;
+                    submitBtn.disabled  = false;
+                }
+            });
+ 
+            // 刷新按钮点击事件 
+            document.getElementById('refresh-btn').addEventListener('click',  function() {
+                const ip = document.getElementById('ip-input').value.trim();  
+                if (ip) {
+                    document.getElementById('submit-btn').click(); 
+                }
+            });
+ 
+            // 更新UI显示数据 
+            function updateUI(ipResponse, latLngResponse) {
+                const resultContainer = document.getElementById('result-container');  
+                resultContainer.classList.remove('hidden');  
+ 
+                // 更新IP信息 
+                document.getElementById('country').textContent  = ipResponse.data.rgeo?.country  || '-'; 
+                document.getElementById('province').textContent  = ipResponse.data.rgeo?.province  || '-'; 
+                document.getElementById('city').textContent  = ipResponse.data.rgeo?.city  || '-'; 
+                document.getElementById('district').textContent  = ipResponse.data.rgeo?.district  || '-'; 
+                document.getElementById('lng').textContent  = ipResponse.data.lng  || '-'; 
+                document.getElementById('lat').textContent  = ipResponse.data.lat  || '-'; 
+                document.getElementById('detail').textContent  = latLngResponse.data.detail  || '-'; 
+            }
+ 
+            // 初始化默认IP 
+            document.getElementById('ip-input').value  = '1.1.1.1';
+
+            // 初始化国内IP地图
+            const domesticMap = new AMap.Map("domestic-map-container", {
+                zoom: 12,
+                center: [116.4074, 39.9042], // 默认北京
+                viewMode: "3D",
+                pitch: 50,
+                rotation: -15,
+            });
+
+            // 初始化国外IP地图
+            const internationalMap = new AMap.Map("international-map-container", {
+                zoom: 12,
+                center: [0, 0], // 默认世界中心
+                viewMode: "3D",
+                pitch: 50,
+                rotation: -15,
+            });
+
+            // 获取并显示国内IP信息
+            async function getDomesticIpInfo() {
+                try {
+                    const response = await fetch("/api/domestic-ip");
+                    const result = await response.json();
+                    if (result.ret === 200 && result.data) {
+                        const data = result.data;
+                        document.getElementById("domestic-ip").textContent = data.ip;
+                        const address = `${data.country}/${data.prov}/${data.city}/${data.area}`;
+                        document.getElementById("domestic-address").textContent = address;
+
+                        let lat = data.lat;
+                        let lng = data.lng;
+
+                        // 尝试使用美团接口获取更精确的经纬度
+                        const ipLocResponse = await fetch(`/api/ip-loc?ip=${data.ip}`);
+                        const ipLocData = await ipLocResponse.json();
+                        if (ipLocData.data && ipLocData.data.lat && ipLocData.data.lng) {
+                            lat = ipLocData.data.lat;
+                            lng = ipLocData.data.lng;
+                        }
+
+                        if (lng && lat) {
+                            updateMapMarker(domesticMap, parseFloat(lng), parseFloat(lat), address);
+                        }
+                    }
+                } catch (error) {
+                    console.error("获取国内IP信息失败:", error);
+                    document.getElementById("domestic-ip").textContent = "获取失败";
+                    document.getElementById("domestic-address").textContent = "获取失败";
+                }
+            }
+
+            // 获取并显示国外IP信息
+            async function getInternationalIpInfo() {
+                try {
+                    // 首先获取本机的国外IP地址
+                    const ipResponse = await fetch("/api/international-ip");
+                    const ipData = await ipResponse.json();
+                    if (ipData.status === "success") {
+                        document.getElementById("international-ip").textContent = ipData.query;
+                        const address = `${ipData.country}/${ipData.regionName}/${ipData.city}`;
+                        document.getElementById("international-address").textContent = address;
+
+                        let lat = ipData.lat;
+                        let lng = ipData.lon;
+
+                        // 尝试使用美团接口获取更精确的经纬度
+                        const meituanIpLocResponse = await fetch(`/api/ip-loc?ip=${ipData.query}`);
+                        const meituanIpLocData = await meituanIpLocResponse.json();
+
+                        if (meituanIpLocData.data && meituanIpLocData.data.lat && meituanIpLocData.data.lng) {
+                            lat = meituanIpLocData.data.lat;
+                            lng = meituanIpLocData.data.lng;
+                        }
+
+                        if (lng && lat) {
+                            updateMapMarker(internationalMap, parseFloat(lng), parseFloat(lat), address);
+                        }
+                    }
+                } catch (error) {
+                    console.error("获取国外IP信息失败:", error);
+                    document.getElementById("international-ip").textContent = "获取失败";
+                    document.getElementById("international-address").textContent = "获取失败";
+                }
+            }
+
+            // 通用地图标记更新函数 
+            function updateMapMarker(mapInstance, lng, lat, title) {
+                // 清除现有标记 
+                mapInstance.clearMap();  
+ 
+                // 添加新标记 
+                const marker = new AMap.Marker({
+                    position: new AMap.LngLat(lng, lat),
+                    title: title,
+                    offset: new AMap.Pixel(-13, -30) 
+                });
+                mapInstance.add(marker);  
+ 
+                // 设置地图中心点 
+                mapInstance.setCenter([lng, lat]);
+ 
+                // 添加信息窗口 
+                const infoWindow = new AMap.InfoWindow({
+                    content: `<div class="p-2">
+                        <h3 class="font-bold">${title}</h3>
+                        <p class="text-sm">经度: ${lng?.toFixed(6) || '-'}</p> 
+                        <p class="text-sm">纬度: ${lat?.toFixed(6) || '-'}</p> 
+                    </div>`,
+                    offset: new AMap.Pixel(0, -30)
+                });
+                
+                infoWindow.open(mapInstance, marker.getPosition());  
+            }
+
+            // 页面加载时调用
+            getDomesticIpInfo();
+            getInternationalIpInfo();
+        });
+    </script>
 </body>  
-</html>'''
+</html>
