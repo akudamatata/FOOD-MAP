@@ -142,6 +142,45 @@
                 </div>
             </div>
         </div>
+
+        <!-- 新增的IP地址查询和地图显示区域 -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+            <!-- 国内IP地址信息 -->
+            <div>
+                <div class="card bg-white p-6 h-full">
+                    <h2 class="text-xl font-semibold text-gray-800 mb-4">国内IP地址信息</h2>
+                    <div id="domestic-ip-info" class="space-y-4 animate-fade-in">
+                        <div class="data-badge p-3">
+                            <p class="text-xs text-blue-100">IP地址</p>
+                            <p id="domestic-ip" class="font-medium">-</p>
+                        </div>
+                        <div class="data-badge p-3">
+                            <p class="text-xs text-blue-100">归属地</p>
+                            <p id="domestic-address" class="font-medium">-</p>
+                        </div>
+                    </div>
+                    <div id="domestic-map-container" class="map-container mt-4"></div>
+                </div>
+            </div>
+
+            <!-- 国外IP地址信息 -->
+            <div>
+                <div class="card bg-white p-6 h-full">
+                    <h2 class="text-xl font-semibold text-gray-800 mb-4">国外IP地址信息</h2>
+                    <div id="international-ip-info" class="space-y-4 animate-fade-in">
+                        <div class="data-badge p-3">
+                            <p class="text-xs text-blue-100">IP地址</p>
+                            <p id="international-ip" class="font-medium">-</p>
+                        </div>
+                        <div class="data-badge p-3">
+                            <p class="text-xs text-blue-100">归属地</p>
+                            <p id="international-address" class="font-medium">-</p>
+                        </div>
+                    </div>
+                    <div id="international-map-container" class="map-container mt-4"></div>
+                </div>
+            </div>
+        </div>
     </div>
  
     <!-- 使用高德地图JS API -->
@@ -284,6 +323,122 @@
  
             // 初始化默认IP 
             document.getElementById('ip-input').value  = '1.1.1.1';
+        });
+    </script>
+</body>
+</html>
+
+
+            // 初始化国内IP地图
+            const domesticMap = new AMap.Map("domestic-map-container", {
+                zoom: 12,
+                center: [116.4074, 39.9042], // 默认北京
+                viewMode: "3D",
+                pitch: 50,
+                rotation: -15,
+            });
+
+            // 初始化国外IP地图
+            const internationalMap = new AMap.Map("international-map-container", {
+                zoom: 12,
+                center: [0, 0], // 默认世界中心
+                viewMode: "3D",
+                pitch: 50,
+                rotation: -15,
+            });
+
+            // 获取并显示国内IP信息
+            async function getDomesticIpInfo() {
+                try {
+                    const response = await fetch("/api/domestic-ip");
+                    const result = await response.json();
+                    if (result.ret === 200 && result.data) {
+                        const data = result.data;
+                        document.getElementById("domestic-ip").textContent = data.ip;
+                        const address = `${data.country}/${data.prov}/${data.city}/${data.area}`;
+                        document.getElementById("domestic-address").textContent = address;
+
+                        let lat = data.lat;
+                        let lng = data.lng;
+
+                        // 尝试使用美团接口获取更精确的经纬度
+                        const ipLocResponse = await fetch(`/api/ip-loc?ip=${data.ip}`);
+                        const ipLocData = await ipLocResponse.json();
+                        if (ipLocData.data && ipLocData.data.lat && ipLocData.data.lng) {
+                            lat = ipLocData.data.lat;
+                            lng = ipLocData.data.lng;
+                        }
+
+                        if (lng && lat) {
+                            updateMapMarker(domesticMap, parseFloat(lng), parseFloat(lat), address);
+                        }
+                    }
+                } catch (error) {
+                    console.error("获取国内IP信息失败:", error);
+                    document.getElementById("domestic-ip").textContent = "获取失败";
+                    document.getElementById("domestic-address").textContent = "获取失败";
+                }
+            }
+
+            // 获取并显示国外IP信息
+            async function getInternationalIpInfo() {
+                try {
+                    // 首先获取本机的国外IP地址
+                    const ipResponse = await fetch("/api/international-ip");
+                    const ipData = await ipResponse.json();
+                    if (ipData.status === "success") {
+                        document.getElementById("international-ip").textContent = ipData.query;
+                        const address = `${ipData.country}/${ipData.regionName}/${ipData.city}`;
+                        document.getElementById("international-address").textContent = address;
+
+                        let lat = ipData.lat;
+                        let lng = ipData.lon;
+
+                        // 尝试使用美团接口获取更精确的经纬度
+                        const meituanIpLocResponse = await fetch(`/api/ip-loc?ip=${ipData.query}`);
+                        const meituanIpLocData = await meituanIpLocResponse.json();
+
+                        if (meituanIpLocData.data && meituanIpLocData.data.lat && meituanIpLocData.data.lng) {
+                            lat = meituanIpLocData.data.lat;
+                            lng = meituanIpLocData.data.lng;
+                        }
+
+                        if (lng && lat) {
+                            updateMapMarker(internationalMap, parseFloat(lng), parseFloat(lat), address);
+                        }
+                    }
+                } catch (error) {
+                    console.error("获取国外IP信息失败:", error);
+                    document.getElementById("international-ip").textContent = "获取失败";
+                    document.getElementById("international-address").textContent = "获取失败";
+                }
+            }
+
+            // 通用地图标记更新函数
+            function updateMapMarker(mapInstance, lng, lat, title) {
+                mapInstance.clearMap();
+                const marker = new AMap.Marker({
+                    position: new AMap.LngLat(lng, lat),
+                    title: title,
+                    offset: new AMap.Pixel(-13, -30),
+                });
+                mapInstance.add(marker);
+                mapInstance.setCenter([lng, lat]);
+
+                const infoWindow = new AMap.InfoWindow({
+                    content: `<div class="p-2">
+                        <h3 class="font-bold">${title}</h3>
+                        <p class="text-sm">经度: ${lng?.toFixed(6) || "-"}</p>
+                        <p class="text-sm">纬度: ${lat?.toFixed(6) || "-"}</p>
+                    </div>`,
+                    offset: new AMap.Pixel(0, -30),
+                });
+                infoWindow.open(mapInstance, marker.getPosition());
+            }
+
+            // 页面加载时调用
+            getDomesticIpInfo();
+            getInternationalIpInfo();
         });
     </script>
 </body>

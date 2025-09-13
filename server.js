@@ -94,7 +94,28 @@ app.get('/api/amap/regeocode',  async (req, res) => {
     }
 });
  
-// 启动服务器 
-app.listen(PORT, () => {
-    console.log(`服务器运行在 http://localhost:${PORT}`);
+
+// 国内IP查询代理
+app.get("/api/domestic-ip", async (req, res) => {
+    try {
+        const { ip } = req.query;
+        const apiUrl = ip ? `https://ip9.com.cn/get?ip=${ip}` : "https://ip9.com.cn/get";
+        const response = await axios.get(apiUrl);
+        res.json(response.data);
+    } catch (error) {
+        console.error("国内IP查询错误:", error);
+        res.status(500).json({ error: "获取国内IP信息失败" });
+    }
+});
+
+// 国外IP查询代理
+app.get("/api/international-ip", async (req, res) => {
+    try {
+        const { ip } = req.query;
+        const response = await axios.get(`http://ip-api.com/json/${ip}`);
+        res.json(response.data);
+    } catch (error) {
+        console.error("国外IP查询错误:", error);
+        res.status(500).json({ error: "获取国外IP信息失败" });
+    }
 });
