@@ -96,6 +96,9 @@
             transition: all 0.3s ease;
             border-radius: 12px;
             overflow: hidden;
+            display: flex; /* Added for consistent height */
+            flex-direction: column; /* Added for consistent height */
+            height: 100%; /* Added for consistent height */
         }
 
         .card:hover {
@@ -253,6 +256,9 @@
 
         .card-content {
             padding: 24px;
+            flex-grow: 1; /* Added for consistent height */
+            display: flex; /* Added for consistent height */
+            flex-direction: column; /* Added for consistent height */
         }
 
         .form-group {
@@ -272,6 +278,7 @@
             grid-template-columns: 1fr 1fr;
             gap: 16px;
             margin-top: 24px;
+            flex-grow: 1; /* Added for consistent height */
         }
 
         .result-full {
