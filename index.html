@@ -8,135 +8,413 @@
     <link rel="stylesheet" href="https://s2.ssl.qhres2.com/static/56662140ef7d5d03.css">  
     <style>
         :root {
-            --primary: #3a86ff;
-            --secondary: #8338ec;
-            --accent: #ff006e;
-            --dark: #1a1a2e;
-            --light: #f8f9fa;
+            /* 深色主题变量 (默认) */
+            --bg-primary: #0f1419;
+            --bg-secondary: #1a1f2e;
+            --bg-card: #1e2532;
+            --text-primary: #e2e8f0;
+            --text-secondary: #94a3b8;
+            --text-muted: #64748b;
+            --border-color: #334155;
+            --green-primary: #00d084;
+            --green-secondary: #00a86b;
+            --green-accent: #4ade80;
+            --green-light: rgba(0, 208, 132, 0.1);
+            --shadow-color: rgba(0, 208, 132, 0.2);
+            --shadow-hover: rgba(0, 208, 132, 0.3);
         }
+
+        [data-theme="light"] {
+            /* 浅色主题变量 */
+            --bg-primary: #f8fafc;
+            --bg-secondary: #ffffff;
+            --bg-card: #ffffff;
+            --text-primary: #1e293b;
+            --text-secondary: #64748b;
+            --text-muted: #94a3b8;
+            --border-color: #e2e8f0;
+            --green-primary: #059669;
+            --green-secondary: #10b981;
+            --green-accent: #34d399;
+            --green-light: rgba(5, 150, 105, 0.1);
+            --shadow-color: rgba(0, 0, 0, 0.1);
+            --shadow-hover: rgba(0, 0, 0, 0.15);
+        }
+
+        * {
+            transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+        }
+
         body {
             font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
-            background-color: #f5f7fa;
-            color: var(--dark);
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
             min-height: 100vh;
+            margin: 0;
+            padding: 0;
         }
+
+        .theme-toggle {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--green-primary), var(--green-secondary));
+            border: none;
+            color: white;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            box-shadow: 0 4px 12px var(--shadow-color);
+            transition: all 0.3s ease;
+        }
+
+        .theme-toggle:hover {
+            transform: translateY(-2px) scale(1.05);
+            box-shadow: 0 6px 20px var(--shadow-hover);
+        }
+
+        .theme-toggle:active {
+            transform: translateY(0) scale(0.95);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
         .card {
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            background-color: var(--bg-card);
+            border: 1px solid var(--border-color);
+            box-shadow: 0 4px 6px var(--shadow-color);
             transition: all 0.3s ease;
             border-radius: 12px;
             overflow: hidden;
         }
+
         .card:hover {
-            box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 10px 25px var(--shadow-hover);
             transform: translateY(-2px);
         }
+
         .map-container {
             height: 500px;
             width: 100%;
             border-radius: 12px;
             overflow: hidden;
+            border: 1px solid var(--border-color);
         }
+
         .input-group {
             position: relative;
         }
+
         .input-group input {
-            padding-right: 2.5rem;
+            width: 100%;
+            padding: 12px 45px 12px 16px;
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            background-color: var(--bg-secondary);
+            color: var(--text-primary);
+            font-size: 14px;
+            transition: all 0.3s ease;
         }
+
+        .input-group input:focus {
+            outline: none;
+            border-color: var(--green-primary);
+            box-shadow: 0 0 0 3px var(--green-light);
+        }
+
         .input-group-icon {
             position: absolute;
-            right: 0.75rem;
+            right: 12px;
             top: 50%;
             transform: translateY(-50%);
-            color: var(--primary);
+            color: var(--green-primary);
         }
+
         .data-badge {
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            background: linear-gradient(135deg, var(--green-primary), var(--green-secondary));
             color: white;
             border-radius: 8px;
+            padding: 12px;
         }
+
+        .btn-primary {
+            width: 100%;
+            background: linear-gradient(135deg, var(--green-primary), var(--green-secondary));
+            color: white;
+            padding: 12px 16px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px var(--shadow-hover);
+        }
+
+        .btn-primary:active {
+            transform: translateY(0);
+        }
+
+        .btn-primary:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-secondary {
+            padding: 8px 12px;
+            background-color: var(--green-light);
+            color: var(--green-primary);
+            border: 1px solid var(--green-primary);
+            border-radius: 20px;
+            font-size: 12px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            transition: all 0.3s ease;
+        }
+
+        .btn-secondary:hover {
+            background-color: var(--green-primary);
+            color: white;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding-top: 60px;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: var(--text-primary);
+            margin-bottom: 8px;
+        }
+
+        .header .gradient-text {
+            background: linear-gradient(135deg, var(--green-primary), var(--green-accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .header p {
+            color: var(--text-secondary);
+            max-width: 600px;
+            margin: 0 auto;
+            font-size: 1.1rem;
+        }
+
+        .grid {
+            display: grid;
+            gap: 24px;
+            margin-bottom: 32px;
+        }
+
+        .grid-cols-1 {
+            grid-template-columns: 1fr;
+        }
+
+        .lg-grid-cols-3 {
+            grid-template-columns: 2fr 1fr;
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+
+        .card-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .card-content {
+            padding: 24px;
+        }
+
+        .form-group {
+            margin-bottom: 24px;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--text-secondary);
+            margin-bottom: 6px;
+        }
+
+        .result-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            margin-top: 24px;
+        }
+
+        .result-full {
+            grid-column: 1 / -1;
+        }
+
+        .hidden {
+            display: none;
+        }
+
         @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
+            from { 
+                opacity: 0; 
+                transform: translateY(10px); 
+            }
+            to { 
+                opacity: 1; 
+                transform: translateY(0); 
+            }
         }
+
         .animate-fade-in {
             animation: fadeIn 0.5s ease-out forwards;
         }
+
+        @media (max-width: 1024px) {
+            .lg-grid-cols-3 {
+                grid-template-columns: 1fr;
+            }
+            
+            .theme-toggle {
+                top: 15px;
+                right: 15px;
+                width: 45px;
+                height: 45px;
+                font-size: 18px;
+            }
+            
+            .header {
+                padding-top: 80px;
+            }
+            
+            .header h1 {
+                font-size: 2rem;
+            }
+        }
+
+        @media (max-width: 640px) {
+            .container {
+                padding: 15px;
+            }
+            
+            .result-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .header h1 {
+                font-size: 1.75rem;
+            }
+            
+            .map-container {
+                height: 400px;
+            }
+        }
     </style>
 </head>
-<body class="bg-gray-50">
-    <div class="container mx-auto px-4 py-8">
-        <header class="mb-10 text-center">
-            <h1 class="text-4xl font-bold text-gray-800 mb-2">GeoLocation <span class="text-transparent bg-clip-text bg-gradient-to-r from-blue-500 to-purple-600">Analytics</span></h1>
-            <p class="text-gray-600 max-w-2xl mx-auto">基于MTAPI的IP地理定位溯源与可视化系统</p>
+<body>
+    <!-- 主题切换按钮 -->
+    <button class="theme-toggle" id="theme-toggle" title="切换主题">
+        <i class="fas fa-moon" id="theme-icon"></i>
+    </button>
+
+    <div class="container">
+        <header class="header">
+            <h1>GeoLocation <span class="gradient-text">Analytics</span></h1>
+            <p>基于MTAPI的IP地理定位溯源与可视化系统</p>
         </header>
  
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
-            <div class="lg:col-span-2">
-                <div class="card bg-white p-6">
-                    <div class="flex justify-between items-center mb-4">
-                        <h2 class="text-xl font-semibold text-gray-800">地理信息可视化</h2>
-                        <div class="flex space-x-2">
-                            <button id="refresh-btn" class="px-3 py-1 bg-blue-50 text-blue-600 rounded-full text-sm flex items-center">
-                                <i class="fas fa-sync-alt mr-1"></i> 刷新 
+        <div class="grid grid-cols-1 lg-grid-cols-3">
+            <div>
+                <div class="card">
+                    <div class="card-content">
+                        <div class="card-header">
+                            <h2 class="card-title">地理信息可视化</h2>
+                            <button id="refresh-btn" class="btn-secondary">
+                                <i class="fas fa-sync-alt"></i> 刷新 
                             </button>
                         </div>
+                        <div id="map-container" class="map-container"></div>
                     </div>
-                    <div id="map-container" class="map-container"></div>
                 </div>
             </div>
  
             <div>
-                <div class="card bg-white p-6 h-full">
-                    <h2 class="text-xl font-semibold text-gray-800 mb-4">IP定位查询</h2>
-                    
-                    <div class="mb-6">
-                        <label class="block text-sm font-medium text-gray-700 mb-1">输入IP地址</label>
-                        <div class="input-group relative">
-                            <input type="text" id="ip-input" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" value="1.1.1.1">
-                            <div class="input-group-icon">
-                                <i class="fas fa-map-marker-alt"></i>
+                <div class="card">
+                    <div class="card-content">
+                        <h2 class="card-title">IP定位查询</h2>
+                        
+                        <div class="form-group">
+                            <label class="form-label">输入IP地址</label>
+                            <div class="input-group">
+                                <input type="text" id="ip-input" value="1.1.1.1" placeholder="请输入IP地址">
+                                <div class="input-group-icon">
+                                    <i class="fas fa-map-marker-alt"></i>
+                                </div>
                             </div>
                         </div>
-                    </div>
  
-                    <button id="submit-btn" class="w-full bg-gradient-to-r from-blue-500 to-purple-600 text-white py-2 px-4 rounded-lg hover:opacity-90 transition-all duration-200 flex items-center justify-center">
-                        <i class="fas fa-search-location mr-2"></i> 查询位置 
-                    </button>
+                        <button id="submit-btn" class="btn-primary">
+                            <i class="fas fa-search-location" style="margin-right: 8px;"></i> 查询位置 
+                        </button>
  
-                    <div id="result-container" class="mt-6 space-y-4 hidden animate-fade-in">
-                        <div class="grid grid-cols-2 gap-4">
-                            <div class="data-badge p-3">
-                                <p class="text-xs text-blue-100">国家</p>
-                                <p id="country" class="font-medium">-</p>
+                        <div id="result-container" class="hidden animate-fade-in">
+                            <div class="result-grid">
+                                <div class="data-badge">
+                                    <p style="font-size: 12px; opacity: 0.8; margin: 0 0 4px 0;">国家</p>
+                                    <p id="country" style="font-weight: 500; margin: 0;">-</p>
+                                </div>
+                                <div class="data-badge">
+                                    <p style="font-size: 12px; opacity: 0.8; margin: 0 0 4px 0;">省份</p>
+                                    <p id="province" style="font-weight: 500; margin: 0;">-</p>
+                                </div>
+                                <div class="data-badge">
+                                    <p style="font-size: 12px; opacity: 0.8; margin: 0 0 4px 0;">城市</p>
+                                    <p id="city" style="font-weight: 500; margin: 0;">-</p>
+                                </div>
+                                <div class="data-badge">
+                                    <p style="font-size: 12px; opacity: 0.8; margin: 0 0 4px 0;">区域</p>
+                                    <p id="district" style="font-weight: 500; margin: 0;">-</p>
+                                </div>
+                                <div class="data-badge">
+                                    <p style="font-size: 12px; opacity: 0.8; margin: 0 0 4px 0;">经度</p>
+                                    <p id="lng" style="font-weight: 500; margin: 0;">-</p>
+                                </div>
+                                <div class="data-badge">
+                                    <p style="font-size: 12px; opacity: 0.8; margin: 0 0 4px 0;">纬度</p>
+                                    <p id="lat" style="font-weight: 500; margin: 0;">-</p>
+                                </div>
+                                <div class="data-badge result-full">
+                                    <p style="font-size: 12px; opacity: 0.8; margin: 0 0 4px 0;">详细地址</p>
+                                    <p id="detail" style="font-weight: 500; margin: 0;">-</p>
+                                </div>
                             </div>
-                            <div class="data-badge p-3">
-                                <p class="text-xs text-blue-100">省份</p>
-                                <p id="province" class="font-medium">-</p>
-                            </div>
-                        </div>
-                        <div class="grid grid-cols-2 gap-4">
-                            <div class="data-badge p-3">
-                                <p class="text-xs text-blue-100">城市</p>
-                                <p id="city" class="font-medium">-</p>
-                            </div>
-                            <div class="data-badge p-3">
-                                <p class="text-xs text-blue-100">区域</p>
-                                <p id="district" class="font-medium">-</p>
-                            </div>
-                        </div>
-                        <div class="grid grid-cols-2 gap-4">
-                            <div class="data-badge p-3">
-                                <p class="text-xs text-blue-100">经度</p>
-                                <p id="lng" class="font-medium">-</p>
-                            </div>
-                            <div class="data-badge p-3">
-                                <p class="text-xs text-blue-100">纬度</p>
-                                <p id="lat" class="font-medium">-</p>
-                            </div>
-                        </div>
-                        <div class="data-badge p-3">
-                            <p class="text-xs text-blue-100">详细地址</p>
-                            <p id="detail" class="font-medium">-</p>
                         </div>
                     </div>
                 </div>
@@ -152,13 +430,50 @@
     </script>
     <script src="https://webapi.amap.com/maps?v=2.0&key=834b0ef90a0c08500b7a24dfdd6cf9ef"></script>  
     <script>
-        document.addEventListener('DOMContentLoaded',  function() {
+        // 主题切换功能
+        class ThemeManager {
+            constructor() {
+                this.currentTheme = localStorage.getItem('theme') || 'dark';
+                this.themeToggle = document.getElementById('theme-toggle');
+                this.themeIcon = document.getElementById('theme-icon');
+                
+                this.init();
+            }
+            
+            init() {
+                this.applyTheme(this.currentTheme);
+                this.themeToggle.addEventListener('click', () => this.toggleTheme());
+            }
+            
+            applyTheme(theme) {
+                if (theme === 'light') {
+                    document.documentElement.setAttribute('data-theme', 'light');
+                    this.themeIcon.className = 'fas fa-sun';
+                } else {
+                    document.documentElement.removeAttribute('data-theme');
+                    this.themeIcon.className = 'fas fa-moon';
+                }
+                this.currentTheme = theme;
+                localStorage.setItem('theme', theme);
+            }
+            
+            toggleTheme() {
+                const newTheme = this.currentTheme === 'dark' ? 'light' : 'dark';
+                this.applyTheme(newTheme);
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            // 初始化主题管理器
+            new ThemeManager();
+            
             // 初始化地图 
             const map = new AMap.Map('map-container', {
                 zoom: 12,
                 viewMode: '3D',
                 pitch: 50,
-                rotation: -15 
+                rotation: -15,
+                mapStyle: 'amap://styles/dark' // 默认使用暗色地图
             });
  
             // 添加地图控件 
@@ -169,21 +484,36 @@
                 'AMap.MapType',
                 'AMap.Geolocation'
             ], function() {
-                map.addControl(new  AMap.ToolBar());
-                map.addControl(new  AMap.Scale());
-                map.addControl(new  AMap.HawkEye({isOpen:true}));
-                map.addControl(new  AMap.MapType());
-                map.addControl(new  AMap.Geolocation());
+                map.addControl(new AMap.ToolBar());
+                map.addControl(new AMap.Scale());
+                map.addControl(new AMap.HawkEye({isOpen:true}));
+                map.addControl(new AMap.MapType());
+                map.addControl(new AMap.Geolocation());
+            });
+
+            // 监听主题变化，更新地图样式
+            const observer = new MutationObserver(function(mutations) {
+                mutations.forEach(function(mutation) {
+                    if (mutation.type === 'attributes' && mutation.attributeName === 'data-theme') {
+                        const isLight = document.documentElement.getAttribute('data-theme') === 'light';
+                        map.setMapStyle(isLight ? 'amap://styles/normal' : 'amap://styles/dark');
+                    }
+                });
+            });
+            
+            observer.observe(document.documentElement, {
+                attributes: true,
+                attributeFilter: ['data-theme']
             });
  
-            // 解决favicon.ico  404问题 
+            // 解决favicon.ico 404问题 
             const link = document.createElement('link');  
-            link.rel  = 'icon';
-            link.href  = 'data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22  viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📍</text></svg>';
+            link.rel = 'icon';
+            link.href = 'data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📍</text></svg>';
             document.head.appendChild(link);  
  
             // 查询按钮点击事件 
-            document.getElementById('submit-btn').addEventListener('click',  async function() {
+            document.getElementById('submit-btn').addEventListener('click', async function() {
                 const ip = document.getElementById('ip-input').value.trim();  
                 if (!ip) {
                     alert('请输入有效的IP地址');
@@ -193,13 +523,13 @@
                 // 显示加载状态 
                 const submitBtn = document.getElementById('submit-btn');  
                 const originalText = submitBtn.innerHTML;  
-                submitBtn.innerHTML  = '<i class="fas fa-spinner fa-spin mr-2"></i> 查询中...';
-                submitBtn.disabled  = true;
+                submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin" style="margin-right: 8px;"></i> 查询中...';
+                submitBtn.disabled = true;
  
                 try {
                     // 1. 获取IP定位信息 
                     const ipLocResponse = await fetch(`/api/ip-loc?ip=${ip}`);
-                    if (!ipLocResponse.ok)  {
+                    if (!ipLocResponse.ok) {
                         throw new Error('IP定位请求失败');
                     }
                     const ipData = await ipLocResponse.json(); 
@@ -208,7 +538,7 @@
                     const lat = ipData.data.lat; 
                     const lng = ipData.data.lng; 
                     const detailResponse = await fetch(`/api/latlng-loc?lat=${lat}&lng=${lng}`);
-                    if (!detailResponse.ok)  {
+                    if (!detailResponse.ok) {
                         throw new Error('详细位置请求失败');
                     }
                     const detailData = await detailResponse.json(); 
@@ -217,19 +547,19 @@
                     updateUI(ipData, detailData);
                     
                     // 更新地图标记 
-                    updateMapMarker(detailData.data.lng,  detailData.data.lat,  detailData.data.detail); 
+                    updateMapMarker(detailData.data.lng, detailData.data.lat, detailData.data.detail); 
                 } catch (error) {
-                    console.error(' 查询失败:', error);
+                    console.error('查询失败:', error);
                     alert(`查询失败: ${error.message}`); 
                 } finally {
                     // 恢复按钮状态 
-                    submitBtn.innerHTML  = originalText;
-                    submitBtn.disabled  = false;
+                    submitBtn.innerHTML = originalText;
+                    submitBtn.disabled = false;
                 }
             });
  
             // 刷新按钮点击事件 
-            document.getElementById('refresh-btn').addEventListener('click',  function() {
+            document.getElementById('refresh-btn').addEventListener('click', function() {
                 const ip = document.getElementById('ip-input').value.trim();  
                 if (ip) {
                     document.getElementById('submit-btn').click(); 
@@ -242,13 +572,13 @@
                 resultContainer.classList.remove('hidden');  
  
                 // 更新IP信息 
-                document.getElementById('country').textContent  = ipResponse.data.rgeo?.country  || '-'; 
-                document.getElementById('province').textContent  = ipResponse.data.rgeo?.province  || '-'; 
-                document.getElementById('city').textContent  = ipResponse.data.rgeo?.city  || '-'; 
-                document.getElementById('district').textContent  = ipResponse.data.rgeo?.district  || '-'; 
-                document.getElementById('lng').textContent  = ipResponse.data.lng  || '-'; 
-                document.getElementById('lat').textContent  = ipResponse.data.lat  || '-'; 
-                document.getElementById('detail').textContent  = latLngResponse.data.detail  || '-'; 
+                document.getElementById('country').textContent = ipResponse.data.rgeo?.country || '-'; 
+                document.getElementById('province').textContent = ipResponse.data.rgeo?.province || '-'; 
+                document.getElementById('city').textContent = ipResponse.data.rgeo?.city || '-'; 
+                document.getElementById('district').textContent = ipResponse.data.rgeo?.district || '-'; 
+                document.getElementById('lng').textContent = ipResponse.data.lng || '-'; 
+                document.getElementById('lat').textContent = ipResponse.data.lat || '-'; 
+                document.getElementById('detail').textContent = latLngResponse.data.detail || '-'; 
             }
  
             // 更新地图标记 
@@ -265,25 +595,25 @@
                 map.add(marker);  
  
                 // 设置地图中心点 
-                map.setCenter([lng,  lat]);
+                map.setCenter([lng, lat]);
  
                 // 添加信息窗口 
                 const infoWindow = new AMap.InfoWindow({
-                    content: `<div class="p-2">
-                        <h3 class="font-bold">${title}</h3>
-                        <p class="text-sm">经度: ${lng?.toFixed(6) || '-'}</p> 
-                        <p class="text-sm">纬度: ${lat?.toFixed(6) || '-'}</p> 
+                    content: `<div style="padding: 12px; background: var(--bg-card); color: var(--text-primary); border-radius: 8px;">
+                        <h3 style="font-weight: bold; margin: 0 0 8px 0; color: var(--green-primary);">${title}</h3>
+                        <p style="font-size: 14px; margin: 4px 0; color: var(--text-secondary);">经度: ${lng?.toFixed(6) || '-'}</p> 
+                        <p style="font-size: 14px; margin: 4px 0; color: var(--text-secondary);">纬度: ${lat?.toFixed(6) || '-'}</p> 
                     </div>`,
                     offset: new AMap.Pixel(0, -30)
                 });
                 
-                infoWindow.open(map,  marker.getPosition());  
+                infoWindow.open(map, marker.getPosition());  
             }
  
-            // 初始化默认IP 
-
+            // 初始化默认位置
             map.setCenter([116.397428, 39.90923]); // 北京市中心
         });
     </script>
 </body>
 </html>
+
